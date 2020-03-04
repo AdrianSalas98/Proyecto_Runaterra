@@ -1,5 +1,10 @@
 package main;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,12 +14,17 @@ import java.util.logging.Logger;
 
 import org.bson.Document;
 
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
 import conector.Conexion;
+import objects.Carta;
 
 public class Main {
 
@@ -102,8 +112,18 @@ public class Main {
 	}
 
 	public static void cargarCartas(MongoClient mongo) {
-		
-		
+		Carta carta = null;
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			carta = mapper.readValue(new File("Cartas.json"), Carta.class);
+		} catch (JsonGenerationException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println(carta);
 	}
 
 }
