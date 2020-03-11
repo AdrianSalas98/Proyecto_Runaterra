@@ -1,5 +1,6 @@
 package objects;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Mazo {
@@ -7,18 +8,18 @@ public class Mazo {
 	private int id_mazo;
 	private String nombre_mazo;
 	private int valor_mazo;
-	private int[] mazo;
+	private ArrayList<Integer> cartas_en_mazo;
 
 	public Mazo() {
 
 	}
 
-	public Mazo(int id_mazo, String nombre_mazo, int valor_mazo, int[] mazo) {
+	public Mazo(int id_mazo, String nombre_mazo, int valor_mazo, ArrayList<Integer> cartas_en_mazo) {
 		super();
 		this.id_mazo = id_mazo;
 		this.nombre_mazo = nombre_mazo;
 		this.valor_mazo = valor_mazo;
-		this.mazo = mazo;
+		this.cartas_en_mazo = cartas_en_mazo;
 	}
 
 	public int getId_mazo() {
@@ -45,17 +46,18 @@ public class Mazo {
 		this.valor_mazo = valor_mazo;
 	}
 
-	public int[] getMazo() {
-		return mazo;
+	public ArrayList<Integer> getCartas_en_mazo() {
+		return cartas_en_mazo;
 	}
 
-	public void setMazo(int[] mazo) {
-		this.mazo = mazo;
+	public void setCartas_en_mazo(ArrayList<Integer> cartas_en_mazo) {
+		this.cartas_en_mazo = cartas_en_mazo;
 	}
 
+	@Override
 	public String toString() {
-		return "Mazo [id_mazo=" + id_mazo + ", nombre_mazo=" + nombre_mazo + ", valor_mazo=" + valor_mazo + ", mazo="
-				+ Arrays.toString(mazo) + "]";
+		return "Mazo [id_mazo=" + id_mazo + ", nombre_mazo=" + nombre_mazo + ", valor_mazo=" + valor_mazo + ", cartas_en_mazo="
+				+ cartas_en_mazo + "]";
 	}
 
 }
