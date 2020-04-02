@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.ObjectInputStream.GetField;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
@@ -65,7 +66,8 @@ public class Main {
 			System.out.println("4. Cargar Mazos");
 			System.out.println("5. Cargar Usuarios");
 			System.out.println("6. Importar Mazo Predifinido");
-			System.out.println("7. Salir");
+			System.out.println("7. Modificar Mazo");
+			System.out.println("8. Salir");
 
 			try {
 
@@ -92,10 +94,13 @@ public class Main {
 					importarPredefinido(mongo);
 					break;
 				case 7:
+					modificarMazo(mongo);
+					break;
+				case 8:
 					salir = true;
 					break;
 				default:
-					System.out.println("Solo números entre 1 y 7");
+					System.out.println("Solo números entre 1 y 8");
 				}
 			} catch (InputMismatchException e) {
 				System.out.println("Debes insertar un número");
@@ -496,13 +501,88 @@ public class Main {
 						collectionUsu.findOneAndReplace(doc, newDoc);
 					}
 				}
-				
+
 				salir = true;
-				
+
 			} else {
 				System.out.println("Los mazos predefinidos son: 1, 2, 3");
 			}
 		}
 
+	}
+
+	public static void modificarMazo(MongoClient mongo) {
+		MongoDatabase db = mongo.getDatabase("Runaterra");
+		MongoCollection<Document> collection = db.getCollection("Mazos");
+		MongoCollection<Document> collectionCa = db.getCollection("Cartas");
+		Scanner lectorInt = new Scanner(System.in);
+		Scanner lectorString = new Scanner(System.in);
+		boolean boo = false;
+		ArrayList<Integer> arrayCartas = new ArrayList<Integer>();
+		int nuevoValor = 0;
+
+		System.out.println("Introduce ID mazo a modificar: ");
+		int idMazo = lectorInt.nextInt();
+
+		if (idMazo > 0 && idMazo < collection.countDocuments()) {
+			Document filterDoc = new Document();
+			filterDoc.put("id_mazo", idMazo);
+			Iterator<Document> iter = collection.find(filterDoc).iterator();
+
+			if (iter.hasNext()) {
+				System.out.println("Introduce que quieres modificar del mazo: ");
+				System.out.println("1. Nombre mazo");
+				System.out.println("2. Cartas mazo");
+
+				int opcion = lectorInt.nextInt();
+
+				Document doc = iter.next();
+
+				Mazo mazo = new Mazo();
+				mazo.setId_mazo((int) doc.get("id_mazo"));
+				mazo.setNombre_mazo((String) doc.get("nombre_mazo"));
+				mazo.setCartas_en_mazo((ArrayList<Integer>) doc.get("cartas_en_mazo"));
+				mazo.setValor_mazo((int) doc.get("valor_mazo"));
+				arrayCartas = mazo.getCartas_en_mazo();
+
+				if (opcion == 1) {
+					System.out.println("Introduce nuevo nombre del mazo: ");
+					String nuevoNombreMazo = lectorString.nextLine();
+
+					Document newDoc = new Document("id_mazo", mazo.getId_mazo()).append("nombre_mazo", nuevoNombreMazo)
+							.append("valor_mazo", mazo.getValor_mazo())
+							.append("cartas_en_mazo", mazo.getCartas_en_mazo());
+
+					collection.findOneAndReplace(doc, newDoc);
+
+				}
+
+				if (opcion == 2) {
+					System.out.println("Introduce el id de la carta a añadir al mazo: ");
+					int idCarta = lectorInt.nextInt();
+
+					Document filterDoc2 = new Document();
+					filterDoc2.put("id", idCarta);
+					Iterator<Document> iter2 = collectionCa.find(filterDoc2).iterator();
+
+					if (iter2.hasNext()) {
+
+						Document doc2 = iter2.next();
+
+						arrayCartas.add(idCarta);
+
+						nuevoValor = mazo.getValor_mazo() + doc2.getInteger("coste_invocacion");
+
+						Document newDoc = new Document("id_mazo", mazo.getId_mazo())
+								.append("nombre_mazo", mazo.getNombre_mazo()).append("valor_mazo", nuevoValor)
+								.append("cartas_en_mazo", arrayCartas);
+
+						collection.findOneAndReplace(doc, newDoc);
+					}
+
+				}
+
+			}
+		}
 	}
 }
